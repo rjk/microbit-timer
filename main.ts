@@ -3,10 +3,6 @@ input.onButtonPressed(Button.A, function () {
     basic.showNumber(alarmMins)
 })
 function ShowTimer (num: number) {
-    basic.showString("!")
-    basic.pause(250)
-    basic.showNumber(num)
-    basic.pause(250)
     basic.showLeds(`
         . . . . .
         . . . . .
@@ -28,21 +24,37 @@ function ShowTimer (num: number) {
 }
 input.onButtonPressed(Button.AB, function () {
     alarmMins = 0
-    basic.showIcon(IconNames.Heart)
+    basic.showNumber(alarmMins)
 })
 input.onButtonPressed(Button.B, function () {
     ShowTimer(alarmMins)
-    while (true) {
-        basic.pause(1000)
+    startTimeMs = input.runningTime()
+    endTimeMs = startTimeMs + alarmMins * 1000
+    minsLeft = alarmMins
+    while (input.runningTime() < endTimeMs) {
+        while ((endTimeMs - input.runningTime()) / 1000 < minsLeft) {
+            FlashLed(minsLeft)
+            basic.pause(200)
+        }
+        minsLeft = (endTimeMs - input.runningTime()) / 1000
     }
+    ShowTimer(minsLeft)
+    music.playTone(262, music.beat(BeatFraction.Double))
+    basic.showIcon(IconNames.Heart)
 })
 function FlashLed (ledNo: number) {
-	
+    led2 = ledNo - 1
+    x = led2 % 5
+    y = led2 / 5
+    led.toggle(x, y)
+    basic.pause(100)
+    led.toggle(x, y)
 }
+let led2 = 0
+let minsLeft = 0
+let endTimeMs = 0
+let startTimeMs = 0
 let y = 0
 let x = 0
 let alarmMins = 0
 alarmMins = 0
-basic.forever(function () {
-	
-})
